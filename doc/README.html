@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Embedded playground with STM32F302R8</title>
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+    <h1 class="title">Embedded playground with STM32F302R8</h1>
+    <nav id="TOC"><ul>
+<li><a href="#dependencies">0.1 Dependencies</a><ul></ul></li>
+<li><a href="#using-this-template">0.2 Using this template</a><ul></ul></li>
+<li><a href="#vs-code">0.3 VS Code</a><ul></ul></li>
+<li><a href="#license">1 License</a><ul>
+<li><a href="#credits">1.1 Credits</a><ul></ul></li></ul></li></ul></nav><h2 id="dependencies" class="section-header"><a href="#dependencies">0.1 Dependencies</a></h2>
+<p>To build embedded programs using this template you'll need:</p>
+<ul>
+<li>
+<p>Rust 1.31, 1.30-beta, nightly-2018-09-13 or a newer toolchain. e.g. <code>rustup default beta</code></p>
+</li>
+<li>
+<p>The <code>cargo generate</code> subcommand. <a href="https://github.com/ashleygwilliams/cargo-generate#installation">Installation
+instructions</a>.</p>
+</li>
+<li>
+<p><code>rust-std</code> components (pre-compiled <code>core</code> crate) for the ARM Cortex-M
+targets. Run:</p>
+</li>
+</ul>
+<pre><code class="language-console">$ rustup target add thumbv6m-none-eabi thumbv7m-none-eabi thumbv7em-none-eabi thumbv7em-none-eabihf
+</code></pre>
+<h2 id="using-this-template" class="section-header"><a href="#using-this-template">0.2 Using this template</a></h2>
+<p><strong>NOTE</strong>: This is the very short version that only covers building programs. For
+the long version, which additionally covers flashing, running and debugging
+programs, check <a href="https://rust-embedded.github.io/book">the embedded Rust book</a>.</p>
+<ol start="0">
+<li>Before we begin you need to identify some characteristics of the target
+device as these will be used to configure the project:</li>
+</ol>
+<ul>
+<li>
+<p>The ARM core. e.g. Cortex-M3.</p>
+</li>
+<li>
+<p>Does the ARM core include an FPU? Cortex-M4<strong>F</strong> and Cortex-M7<strong>F</strong> cores do.</p>
+</li>
+<li>
+<p>How much Flash memory and RAM does the target device has? e.g. 256 KiB of
+Flash and 32 KiB of RAM.</p>
+</li>
+<li>
+<p>Where are Flash memory and RAM mapped in the address space? e.g. RAM is
+commonly located at address <code>0x2000_0000</code>.</p>
+</li>
+</ul>
+<p>You can find this information in the data sheet or the reference manual of your
+device.</p>
+<ol>
+<li>Instantiate the template.</li>
+</ol>
+<pre><code class="language-console">$ cargo generate --git https://github.com/rust-embedded/cortex-m-quickstart
+ Project Name: app
+ Creating project called `app`...
+ Done! New project created /tmp/app
+
+$ cd app
+</code></pre>
+<ol start="2">
+<li>Set a default compilation target. There are four options as mentioned at the
+bottom of <code>.cargo/config</code>. For the STM32F303VCT6, which has a Cortex-M4F
+core, we'll pick the <code>thumbv7em-none-eabihf</code> target.</li>
+</ol>
+<pre><code class="language-console">$ tail -n6 .cargo/config
+</code></pre>
+<pre><code class="language-toml">[build]
+# Pick ONE of these compilation targets
+# target = &quot;thumbv6m-none-eabi&quot;    # Cortex-M0 and Cortex-M0+
+# target = &quot;thumbv7m-none-eabi&quot;    # Cortex-M3
+# target = &quot;thumbv7em-none-eabi&quot;   # Cortex-M4 and Cortex-M7 (no FPU)
+target = &quot;thumbv7em-none-eabihf&quot; # Cortex-M4F and Cortex-M7F (with FPU)
+</code></pre>
+<ol start="3">
+<li>Enter the memory region information into the <code>memory.x</code> file.</li>
+</ol>
+<pre><code class="language-console">$ cat memory.x
+/* Linker script for the STM32F303VCT6 */
+MEMORY
+{
+  /* NOTE 1 K = 1 KiBi = 1024 bytes */
+  FLASH : ORIGIN = 0x08000000, LENGTH = 256K
+  RAM : ORIGIN = 0x20000000, LENGTH = 40K
+}
+</code></pre>
+<pre><code class="language-console">$ cat memory.x
+/* Linker script for the STM32F302R8 */
+MEMORY
+{
+  /* NOTE 1 K = 1 KiBi = 1024 bytes */
+  FLASH : ORIGIN = 0x08000000, LENGTH = 64K
+  RAM : ORIGIN = 0x20000000, LENGTH = 16K
+}
+</code></pre>
+<ol start="4">
+<li>Build the template application or one of the examples.</li>
+</ol>
+<pre><code class="language-console">$ cargo build
+</code></pre>
+<h2 id="vs-code" class="section-header"><a href="#vs-code">0.3 VS Code</a></h2>
+<p>This template includes launch configurations for debugging CortexM programs with Visual Studio Code located in the <code>.vscode/</code> directory.
+See <a href="./.vscode/README.md">.vscode/README.md</a> for more information.
+If you're not using VS Code, you can safely delete the directory from the generated project.</p>
+<h1 id="license" class="section-header"><a href="#license">1 License</a></h1>
+<ul>
+<li>MIT license (<a href="LICENSE-MIT">LICENSE-MIT</a> or http://opensource.org/licenses/MIT)</li>
+</ul>
+<h2 id="credits" class="section-header"><a href="#credits">1.1 Credits</a></h2>
+<p>This project has been generated by cortex-m-quickstart template maintained by
+[team]: https://github.com/rust-embedded/wg#the-cortex-m-team</p>
+
+    
+</body>
+</html>
