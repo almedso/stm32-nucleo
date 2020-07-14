@@ -1,48 +1,57 @@
-
 #![deny(unsafe_code)]
 #![no_std]
 #![no_main]
 
-#[allow(unused_extern_crates)]
+#[allow(unused)]
+use panic_halt;
 
-extern crate panic_halt;
+use cortex_m;
 
-use cortex_m_rt::entry;
-// stm32f30x-hal crate was generated using `svd2rust`
-pub extern crate stm32f30x_hal as hal;
-use hal::{delay::Delay, prelude::*, stm32f30x};
+use cortex_m_rt::{entry, exception, ExceptionFrame};
 
-use hal::gpio::gpiob::{PB13};
-use hal::gpio::{Output, PushPull};
+use hal::{
+    delay::Delay,
+    gpio::{PullNone, PushPull},
+    prelude::*,
+};
 
 #[entry]
 fn main() -> ! {
-
-    let cp = cortex_m::Peripherals::take().unwrap();
-    let p = stm32f30x::Peripherals::take().unwrap();
-
-    let mut flash = p.FLASH.constrain();
-    let mut rcc = p.RCC.constrain();
-    // splits the GPIOA peripheral into 16 independent pins + registers
-    let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
-
-    // clock configuration using the default settings (all clocks run at 8 MHz)
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-    // TRY this alternate clock configuration (all clocks run at 16 MHz)
-    // let clocks = rcc.cfgr.sysclk(16.mhz()).freeze(&mut flash.acr);
+    let device = hal::pac::Peripherals::take().unwrap();
+    let core = cortex_m::Peripherals::take().unwrap();
+    let mut flash = device.FLASH.constrain();
+    let mut rcc = device.RCC.constrain();
+    let clocks = rcc
+        .cfgr
+        .sysclk(64.mhz())
+        .pclk1(32.mhz())
+        .pclk2(32.mhz())
+        .freeze(&mut flash.acr);
+    let mut delay = Delay::new(core.SYST, clocks);
+    let gpiob = device.GPIOB.split(&mut rcc.ahb);
 
     // configure the pin PB13 as an output
-    let mut led: PB13<Output<PushPull>> = gpiob
+    let mut led = gpiob
         .pb13
-        .into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper)
-        .into();
-
-    let mut delay = Delay::new(cp.SYST, clocks);
+        .pull_type(PullNone)
+        .output()
+        .output_type(PushPull);
 
     loop {
-        led.set_high();
-        delay.delay_ms(2_000_u16);
-        led.set_low();
-        delay.delay_ms(2_000_u16);
+        led.set_low().unwrap();
+        delay.delay_ms(250_u16);
+
+        led.set_high().unwrap();
+        delay.delay_ms(250_u16);
     }
+}
+
+#[exception]
+fn HardFault(ef: &ExceptionFrame) -> ! {
+    panic!("HardFault at {:#?}", ef);
+}
+
+#[exception]
+fn DefaultHandler(irqn: i16) {
+    panic!("Unhandled exception (IRQn = {})", irqn);
 }

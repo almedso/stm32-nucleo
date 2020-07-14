@@ -16,7 +16,7 @@
 //!
 //! You'll need to have both OpenOCD and arm-none-eabi-gcc installed.
 //!
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 #![deny(unsafe_code)]
 #![allow(warnings)]
 
@@ -24,6 +24,6 @@
 #![no_std]
 
 // the board configuration
-// pub mod board;
+pub mod board;
 
 

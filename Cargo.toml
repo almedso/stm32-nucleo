@@ -9,7 +9,7 @@ version = "0.1.0"
 hal = { version = "0.24.0", package = "alt-stm32f30x-hal", features = ["rt", "stm32f302"] }
 embedded-hal = "0.2.3"
 # cortex-m-rtic = { version = "0.5.3", git = "https://github.com/rtic-rs/cortex-m-rtic", rev = "cfd5f4785e9c2ae88e666d1fb94a3488904a87f5", optional = true}
-cortex-m-rtic = { version = "0.5.3", optional = true}
+cortex-m-rtic = { version = "0.5.5", optional = true}
 cortex-m-rt = { version = "0.6.10", optional = true }
 cortex-m-semihosting = { version = "0.3.3", optional = true }
 panic-semihosting = { version = "0.5.1", optional = true }
@@ -24,7 +24,7 @@ stm32f3 = {version = "0.11.0"}
 [dev-dependencies]
 # not propagated
 # used to compile examples, tests, benchmarks
-stm32f30x = "0.8.0"
+# stm32f30x = "0.8.0"
 
 [profile.release]
 codegen-units = 1 # better optimizations
@@ -37,4 +37,4 @@ with_device = ["with_rt", "stm32f3/rt", "stm32f3/stm32f302"]
 with_semihosting = ["cortex-m-semihosting", "panic-semihosting"]
 with_rtic = ["cortex-m-rtic"]
 with_rt = ["cortex-m-rt"]
-default = ["with_rtic", "with_device", "nb"]
+default = ["with_rtic", "with_device", "nb", "with_semihosting" ]
