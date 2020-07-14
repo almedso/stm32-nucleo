@@ -5,6 +5,8 @@
 
 #[allow(unused_extern_crates)]
 
+extern crate panic_halt;
+
 use cortex_m_rt::entry;
 // stm32f30x-hal crate was generated using `svd2rust`
 pub extern crate stm32f30x_hal as hal;
@@ -39,8 +41,8 @@ fn main() -> ! {
 
     loop {
         led.set_high();
-        delay.delay_ms(1_000_u16);
+        delay.delay_ms(2_000_u16);
         led.set_low();
-        delay.delay_ms(1_000_u16);
+        delay.delay_ms(2_000_u16);
     }
 }
