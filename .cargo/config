@@ -1,0 +1,13 @@
+# target toolchain
+[thumbv7em-none-eabihf]
+
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+runner = "gdb-multiarch -q -x openocd.gdb"
+rustflags = [ "-C", "link-arg=-Tlink.x",]
+
+# host toolchain
+[target.x86_64-unknown-linux-gnu]
+
+[build]
+# target = "thumbv6m-none-eabi"    # Cortex-M0 and Cortex-M0+
+target = "thumbv7em-none-eabihf" # Cortex-M4F and Cortex-M7F (with FPU)
