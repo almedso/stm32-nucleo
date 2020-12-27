@@ -1,0 +1,43 @@
+os:
+  - linux
+language: rust
+rust:
+  - nightly
+cache:
+  - apt
+matrix:
+  include:
+    - env:
+        - NAME=stm32-nucleo
+        - TARGET=thumbv7em-none-eabihf
+        - LINKER=gcc-arm-none-eabi
+        - PACKAGE=$NAME-armv7hf.tar.gz
+      addons:
+        apt:
+          packages:
+            - gcc-arm-none-eabi
+            - gdb-arm-none-eabi
+    - env:
+        - NAME=stm32-nucleo
+        - TARGET=x86_64-unknown-linux-gnu
+        - PACKAGE=$NAME-x86_64.tar.gz
+
+install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
+  - rustup target add $TARGET || true
+  - |
+    if [ -n "$LINKER" ]; then
+      mkdir -p ~/.cargo
+      echo >> ~/.cargo/config
+      echo "[target.$TARGET]" >> ~/.cargo/config
+      echo "linker = \"$LINKER\"" >> ~/.cargo/config
+    fi
+script:
+  - |
+    if [ $TARGET = "x86_64-unknown-linux-gnu" ]; then
+      cargo test
+    fi
+  - cargo build --target $TARGET --verbose --release
+  - cargo build --target $TARGET --example led
+  - cargo build --target $TARGET --example better-pwm
+  - cargo build --target $TARGET --example motors
